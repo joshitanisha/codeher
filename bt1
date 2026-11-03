@@ -1,0 +1,116 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract BankAccount {
+
+    // Mapping to store balance of each customer address
+    mapping(address => uint256) private balances;
+
+    // Events
+    event Deposited(address indexed customer, uint256 amount);
+    event Withdrawn(address indexed customer, uint256 amount);
+
+    // 1. Deposit Money
+    function deposit() public payable {
+        require(msg.value > 0, "Deposit amount must be greater than 0");
+        balances[msg.sender] += msg.value;
+        emit Deposited(msg.sender, msg.value);
+    }
+
+    // 2. Withdraw Money
+    function withdraw(uint256 amount) public {
+        require(amount > 0, "Withdraw amount must be greater than 0");
+        require(balances[msg.sender] >= amount, "Insufficient balance");
+
+        balances[msg.sender] -= amount;
+        payable(msg.sender).transfer(amount);
+        emit Withdrawn(msg.sender, amount);
+    }
+
+    // 3. Show Balance
+    function showBalance() public view returns (uint256) {
+        return balances[msg.sender];
+    }
+}
+
+
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract StudentData {
+
+    struct Student {
+        uint id;
+        string name;
+        uint age;
+        string course;
+        uint marks;
+    }
+
+    Student[] public students;
+
+    event StudentAdded(
+        uint id,
+        string name,
+        uint age,
+        string course,
+        uint marks
+    );
+
+    function addStudent(
+        string memory _name,
+        uint _age,
+        string memory _course,
+        uint _marks
+    ) public {
+        uint newId = students.length + 1;
+
+        students.push(
+            Student(newId, _name, _age, _course, _marks)
+        );
+
+        emit StudentAdded(
+            newId,
+            _name,
+            _age,
+            _course,
+            _marks
+        );
+    }
+
+    function getStudent(uint _index)
+        public
+        view
+        returns (
+            uint id,
+            string memory name,
+            uint age,
+            string memory course,
+            uint marks
+        )
+    {
+        require(
+            _index < students.length,
+            "Index out of bounds"
+        );
+
+        Student memory s = students[_index];
+
+        return (
+            s.id,
+            s.name,
+            s.age,
+            s.course,
+            s.marks
+        );
+    }
+
+    function getStudentCount() public view returns (uint) {
+        return students.length;
+    }
+
+    function showBalance() public view returns (uint) {
+        return address(this).balance;
+    }
+}
